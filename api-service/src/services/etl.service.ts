@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { DatabaseService } from './database.service';
 
 export interface ETLJob {
@@ -72,11 +72,17 @@ export class ETLService {
   // /**
   //  * Get ETL job status from ETL service
   //  */
-  // async getJobStatus(jobId: string): Promise<{ status: string; progress?: number; message?: string }> {
+  async getJobStatus(jobId: string): Promise<{ status: string; progress?: number; message?: string }> {
   //   // Implementation needed:
   //   // 1. Validate jobId exists in database
+    if (!isUuid(jobId)){
+      return {status: "failed", message: "Invalid job id"}
+    }
   //   // 2. Call ETL service to get real-time status
   //   // 3. Handle connection errors gracefully
   //   // 4. Return formatted status response
-  // }
+    
+    // TODO: implement http call to etl and map response
+    return {status: "pending", progress: 0, message: "stub"}
+  }
 }

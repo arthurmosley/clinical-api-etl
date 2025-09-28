@@ -11,6 +11,7 @@ router.post('/jobs', etlController.submitJob);
 router.get('/jobs/:id', etlController.getJob);
 
 // TODO: Add status endpoint
-// GET /api/etl/jobs/:id/status - Get ETL job status (MISSING - CANDIDATE TO IMPLEMENT)
+// GET /api/etl/jobs/:id/status - Get ETL job status
+router.get('/jobs/:id/status', etlController.getJobStatus);
 
 export default router;
