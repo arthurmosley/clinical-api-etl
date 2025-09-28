@@ -69,6 +69,7 @@ export class ETLController {
 
       successResponse(res, job, 'Job status retrieved successfully');
     } catch (error) {
+      // TODO: Should I be more specific around errors here? Will come back.
       next(error);
     }
   };

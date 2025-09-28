@@ -72,17 +72,39 @@ export class ETLService {
   // /**
   //  * Get ETL job status from ETL service
   //  */
-  async getJobStatus(jobId: string): Promise<{ status: string; progress?: number; message?: string }> {
+  async getJobStatus(jobId: string): Promise<{ status: string; progress?: number; message?: string } | null> {
   //   // Implementation needed:
   //   // 1. Validate jobId exists in database
     if (!isUuid(jobId)){
-      return {status: "failed", message: "Invalid job id"}
+      return null
     }
-  //   // 2. Call ETL service to get real-time status
-  //   // 3. Handle connection errors gracefully
-  //   // 4. Return formatted status response
-    
-    // TODO: implement http call to etl and map response
-    return {status: "pending", progress: 0, message: "stub"}
+    // Checking if the job exists
+    const exists = await this.getJob(jobId);
+    if (!exists) return null;
+
+    // creating object that I will be returning.
+    const jobStatus: {
+        status: string
+        progress?: number,
+        message?: string} = { status: ''}
+
+    try {
+      // http request on the etlService
+      const url = `${this.etlServiceUrl}/jobs/${jobId}/status`
+      const { data } = await axios.get(url, {timeout: 5000});
+      const status = String(data?.status || '');
+      if (!status) return {status: 'failed', message: 'bad etl response'};
+      jobStatus.status = data.status
+      if (typeof data?.progress === 'number') jobStatus.progress = data.progress;
+      if (typeof data?.message === 'string') jobStatus.message = data.message;
+    }
+    catch(error: any) {
+      jobStatus.status = 'failed';
+      jobStatus.message = 'Failed to get ETL job status with error: ' + error?.message;
+    }
+    // TODO: Handle errors more extensively? Revisiting this.
+
+    //   // 3. Handle connection errors gracefully
+    return jobStatus;
   }
 }
