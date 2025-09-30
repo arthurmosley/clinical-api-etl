@@ -24,7 +24,6 @@ def fetch_job(job_id: str) -> Optional[dict]:
     """
     with engine.begin() as conn:
         row = conn.execute(text(
-            
         ), {"id": job_id}).mappings().first()
     return dict(row) if row else None
 

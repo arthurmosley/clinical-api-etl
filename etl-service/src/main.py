@@ -1,14 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
+from .db import upsert_job, fetch_job, complete_job, fail_job
 import uvicorn
-import os
-from sqlalchemy import create_engine
 
 app = FastAPI(title="Clinical Data ETL Service", version="1.0.0")
-DATABASE_URL = os.getenv("DATABASE_URL")
-engine = create_engine(DATABASE_URL)
-
 
 # In-memory job storage (for demo purposes)
 # In production, this would use a proper database or job queue
