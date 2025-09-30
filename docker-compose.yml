@@ -21,6 +21,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:pass@postgres:5432/clinical_data
     volumes:
+      - ./etl-service:/app
       - ./data:/app/data
     restart: unless-stopped
   
