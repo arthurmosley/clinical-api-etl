@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, text
 from typing import Mapping, Any, Optional
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, future=True, pool_pre_ping=True)
 
 def engine_execute(sql: str, mapped_values: Mapping[str, Any]) -> None:
     with engine.begin() as conn:
@@ -22,7 +22,7 @@ def fetch_job(job_id: str) -> Optional[dict]:
     FROM etl_jobs 
     WHERE id=:id"
     """
-    with engine.begin() as conn:
+    with engine.connect() as conn:
         row = conn.execute(text(
         ), {"id": job_id}).mappings().first()
     return dict(row) if row else None

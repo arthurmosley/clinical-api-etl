@@ -2,9 +2,11 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from .db import upsert_job, fetch_job, complete_job, fail_job
+from pathlib import Path
 import uvicorn
 
 app = FastAPI(title="Clinical Data ETL Service", version="1.0.0")
+DATA_DIR = Path("/app/data").resolve()
 
 # In-memory job storage (for demo purposes)
 # In production, this would use a proper database or job queue
@@ -26,57 +28,58 @@ class ETLJobStatus(BaseModel):
     progress: Optional[int] = None
     message: Optional[str] = None
 
+def valid_path(name: str) -> Path:
+    p = (DATA_DIR / name).resolve()
+    if not p.is_file():
+        raise HTTPException(status_code=400, detail="Not a file.")
+    return p
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "etl"}
 
-@app.post("/jobs", response_model=ETLJobResponse)
-async def submit_job(job_request: ETLJobRequest):
+@app.post("/jobs", response_model=ETLJobStatus)
+async def submit_job(req: ETLJobRequest):
     """
     Submit a new ETL job for processing
     """
-    job_id = job_request.jobId
+    path = valid_path(req.filename)
     
-    # Store job in memory (simplified for demo)
-    jobs[job_id] = {
-        "jobId": job_id,
-        "filename": job_request.filename,
-        "studyId": job_request.studyId,
-        "status": "running",
-        "progress": 0,
-        "message": "Job started"
-    }
-    
-    # TODO: Implement actual ETL processing
-    # This is where the candidate would implement:
-    # 1. File extraction
+    upsert_job(req.jobId, req.filename, req.studyId)
+    # In memory storage
+    jobs[req.jobId] = {
+        "jobId": req.jobId,
+        "filename": req.filename,
+        "studyId": req.studyId,
+        "status": "running", 
+        "progress": 0, 
+        "message": "starting"}
 
-
-    # 2. Data transformation 
-    # 3. Quality validation
-    # 4. Database loading
-    
-    return ETLJobResponse(
-        jobId=job_id,
+    return ETLJobStatus(
+        jobId=req.jobId,
         status="running",
-        message="Job submitted successfully"
-    )
+        progress=0,
+        message="starting")
 
 @app.get("/jobs/{job_id}/status", response_model=ETLJobStatus)
 async def get_job_status(job_id: str):
     """
     Get the current status of an ETL job
     """
-    if job_id not in jobs:
+    if job_id in jobs:
+        job = jobs[job_id]
+        return ETLJobStatus(
+            jobId=job_id,
+            status=job["status"],
+            progress=job.get("progress"),
+            message=job.get("message"))
+    row = fetch_job(job_id)
+    if not row:
         raise HTTPException(status_code=404, detail="Job not found")
-    
-    job = jobs[job_id]
     return ETLJobStatus(
         jobId=job_id,
-        status=job["status"],
-        progress=job.get("progress"),
-        message=job.get("message")
-    )
+        status=row["status"],
+        message=row["error_message"])
 
 @app.get("/jobs/{job_id}")
 async def get_job_details(job_id: str):

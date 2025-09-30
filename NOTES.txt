@@ -1,1 +1,9 @@
+--- Checking Tables ---
+docker compose up -d postgres
+docker compose exec postgres psql -U user -d clinical_data -c "\dt"
+
+--- Checking that files exist in container ---
+docker compose exec etl ls -l /app/data
+
 https://docs.sqlalchemy.org/en/20/core/engines.html
+
