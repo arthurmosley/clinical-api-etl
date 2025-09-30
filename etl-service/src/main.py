@@ -3,8 +3,12 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any
 import uvicorn
 import os
+from sqlalchemy import create_engine
 
 app = FastAPI(title="Clinical Data ETL Service", version="1.0.0")
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(DATABASE_URL)
+
 
 # In-memory job storage (for demo purposes)
 # In production, this would use a proper database or job queue
@@ -50,6 +54,8 @@ async def submit_job(job_request: ETLJobRequest):
     # TODO: Implement actual ETL processing
     # This is where the candidate would implement:
     # 1. File extraction
+
+
     # 2. Data transformation 
     # 3. Quality validation
     # 4. Database loading
