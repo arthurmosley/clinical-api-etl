@@ -16,4 +16,5 @@ docker compose exec etl ls -l /app/data
         docker compose logs -f etl
 
 https://docs.sqlalchemy.org/en/20/core/engines.html
+https://fastapi.tiangolo.com/reference/testclient/ 
 

@@ -1,16 +1,14 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
-from .db import upsert_job, fetch_job, complete_job, fail_job
+from db import upsert_job, fetch_job, engine
+from etl import process_job
+from state import jobs
 from pathlib import Path
 import uvicorn
 
 app = FastAPI(title="Clinical Data ETL Service", version="1.0.0")
 DATA_DIR = Path("/app/data").resolve()
-
-# In-memory job storage (for demo purposes)
-# In production, this would use a proper database or job queue
-jobs: Dict[str, Dict[str, Any]] = {}
 
 class ETLJobRequest(BaseModel):
     jobId: str
@@ -38,8 +36,15 @@ def valid_path(name: str) -> Path:
 async def health_check():
     return {"status": "healthy", "service": "etl"}
 
+@app.post("/__test__/reset")
+async def reset_db():
+    with engine.begin() as conn:
+        with open("/app/database/dev/reset.sql") as f:
+            conn.execute(text(f.read()))
+    return {"status":"reset"}
+
 @app.post("/jobs", response_model=ETLJobStatus)
-async def submit_job(req: ETLJobRequest):
+async def submit_job(req: ETLJobRequest, background_tasks: BackgroundTasks):
     """
     Submit a new ETL job for processing
     """
@@ -54,6 +59,7 @@ async def submit_job(req: ETLJobRequest):
         "status": "running", 
         "progress": 0, 
         "message": "starting"}
+    background_tasks.add_task(process_job, req.jobId, str(path))
 
     return ETLJobStatus(
         jobId=req.jobId,
