@@ -51,11 +51,12 @@ export class ETLService {
       // Update job status to running
       await this.dbService.updateETLJobStatus(jobId, 'running');
       job.status = 'running';
+      job.errorMessage = undefined;
     } catch (error) {
       // Update job status to failed
-      await this.dbService.updateETLJobStatus(jobId, 'failed', 'Failed to submit to ETL service');
       job.status = 'failed';
       job.errorMessage = 'Failed to submit to ETL service';
+      await this.dbService.updateETLJobStatus(jobId, job.status, job.errorMessage);
     }
 
     return job;

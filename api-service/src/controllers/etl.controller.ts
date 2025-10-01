@@ -23,7 +23,10 @@ export class ETLController {
       }
 
       const job = await this.etlService.submitJob(filename, studyId);
-      successResponse(res, job, 'ETL job submitted successfully');
+      successResponse(res, {
+        jobId: job.id,
+        status: job.status,
+        message: job.errorMessage ?? 'ETL job submitted successfully'}, 'ETL job submitted successfully');
     } catch (error) {
       next(error);
     }

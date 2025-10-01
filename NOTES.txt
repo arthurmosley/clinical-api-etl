@@ -5,5 +5,15 @@ docker compose exec postgres psql -U user -d clinical_data -c "\dt"
 --- Checking that files exist in container ---
 docker compose exec etl ls -l /app/data
 
+--- Checking new endpoints for 
+    1. @app.post("/jobs", response_model=ETLJobStatus)
+    2. @app.get("/jobs/{job_id}/status", response_model=ETLJobStatus)
+
+        curl -sS -X POST http://localhost:8000/jobs \ -H 'Content-Type: application/json' \ -d '{"jobId":"00000000-0000-0000-0000-00000000abcd","filename":"sample_study001.csv"}' | jq 
+        curl -sS http://localhost:8000/jobs/00000000-0000-0000-0000-00000000abcd/status | jq
+
+--- tracking logs for etl service
+        docker compose logs -f etl
+
 https://docs.sqlalchemy.org/en/20/core/engines.html
 

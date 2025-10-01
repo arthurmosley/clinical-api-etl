@@ -9,22 +9,24 @@ def engine_execute(sql: str, mapped_values: Mapping[str, Any]) -> None:
     with engine.begin() as conn:
         conn.execute(text(sql), mapped_values)
 
+# TODO: Think about if conflict should be handled here or if API is sole creator of the jobs.
 def upsert_job(job_id: str, filename: str, study_id: str | None) -> None:
     sql = """
     INSERT INTO etl_jobs (id, filename, study_id, status, created_at, updated_at, completed_at, error_message)
     VALUES (:id, :fn, :sid, 'running', NOW(), NOW(), NULL, NULL)
+    ON CONFLICT (id) DO UPDATE
+    SET status='running', updated_at=NOW(), error_message=NULL
     """
     engine_execute(sql, {"id": job_id, "fn": filename, "sid": study_id})
 
 def fetch_job(job_id: str) -> Optional[dict]:
     sql = """
-    "SELECT id, status, error_message 
+    SELECT id, status, error_message 
     FROM etl_jobs 
-    WHERE id=:id"
+    WHERE id=:id
     """
     with engine.connect() as conn:
-        row = conn.execute(text(
-        ), {"id": job_id}).mappings().first()
+        row = conn.execute(text(sql), {"id": job_id}).mappings().first()
     return dict(row) if row else None
 
 def complete_job(job_id: str) -> None:
