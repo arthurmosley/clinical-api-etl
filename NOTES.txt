@@ -38,3 +38,18 @@ https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf
             -d '{"filename":"sample_study001.csv","studyId":"STUDY001"}')
             echo "$SUBMIT" | jq .
             JOB=$(echo "$SUBMIT" | jq -r '.data.jobId')
+
+---Pandas notes:
+        df["quality_score"] = pd.to_numeric(df["quality_score"], errors="coerce")
+        df = df.assign(quality_score=pd.to_numeric(df["quality_score"], errors="coerce"))
+
+        The above two things do the same thing just assigning 
+
+-- TODO: Candidate to implement
+-- Expected tables to be designed by candidate:
+-- - clinical_measurements (raw data)
+-- - processed_measurements (transformed data)
+-- - participants
+-- - studies
+-- - data_quality_reports
+-- - measurement_aggregations

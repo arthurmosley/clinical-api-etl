@@ -35,7 +35,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database:/docker-entrypoint-initdb.d:ro
     tmpfs:
       - /var/lib/postgresql/data:noexec,nosuid,size=512m
     restart: unless-stopped
