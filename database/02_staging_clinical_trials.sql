@@ -17,7 +17,9 @@ CREATE TABLE IF NOT EXISTS staging.clinical_measurements (
     -- new columns
     job_id UUID NOT NULL REFERENCES etl_jobs(id) ON DELETE CASCADE,
     source_filename TEXT NOT NULL,
-    row_num INT NOT NULL
+    row_num INT NOT NULL,
+
+    CONSTRAINT ux_raw_job_file_row UNIQUE (job_id, source_filename, row_num)
 );
 
 -- Basic indexes (candidate should optimize)
@@ -25,8 +27,6 @@ CREATE INDEX IF NOT EXISTS idx_clinical_measurements_study_id
     ON staging.clinical_measurements(study_id);
 CREATE INDEX IF NOT EXISTS idx_clinical_measurements_participant_id 
     ON staging.clinical_measurements(participant_id);
-CREATE INDEX IF NOT EXISTS idx_clinical_measurements_timestamp 
-    ON staging.clinical_measurements("timestamp");
 
 CREATE INDEX IF NOT EXISTS ix_raw_study_type_time
   ON staging.clinical_measurements(study_id, measurement_type, "timestamp" DESC);

@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS processed_measurements (
   measurement_type TEXT NOT NULL,
   measured_at TIMESTAMP NOT NULL,
 
-
   value_num NUMERIC(14,4),
   value_text TEXT,
   unit TEXT,
