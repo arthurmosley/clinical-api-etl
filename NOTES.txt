@@ -15,6 +15,26 @@ docker compose exec etl ls -l /app/data
 --- tracking logs for etl service
         docker compose logs -f etl
 
+
 https://docs.sqlalchemy.org/en/20/core/engines.html
 https://fastapi.tiangolo.com/reference/testclient/ 
+https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf 
 
+--- running my pytests
+    docker compose exec etl pytest
+
+--- RESEARCH
+    Why does fastapi testclient have issues with relative paths? (ie --> .path)
+
+--- Testing as of right now:
+    1. Hooked up pytest with fastapi testclient to test endpoints.
+    2. some manual testing:
+        a.
+            curl -s http://localhost:3000/health
+            curl -s http://localhost:8000/health
+        b. 
+            SUBMIT=$(curl -s -X POST http://localhost:3000/api/etl/jobs \
+            -H 'Content-Type: application/json' \
+            -d '{"filename":"sample_study001.csv","studyId":"STUDY001"}')
+            echo "$SUBMIT" | jq .
+            JOB=$(echo "$SUBMIT" | jq -r '.data.jobId')

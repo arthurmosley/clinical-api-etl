@@ -26,7 +26,8 @@ export class ETLController {
       successResponse(res, {
         jobId: job.id,
         status: job.status,
-        message: job.errorMessage ?? 'ETL job submitted successfully'}, 'ETL job submitted successfully');
+        message: job.errorMessage ?? 'ETL job submitted successfully'
+      }, 'ETL job submitted successfully');
     } catch (error) {
       next(error);
     }
