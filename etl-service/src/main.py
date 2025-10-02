@@ -5,6 +5,7 @@ from db import upsert_job, fetch_job, engine
 from etl import process_job
 from state import jobs
 from pathlib import Path
+from sqlalchemy import text
 import uvicorn
 
 app = FastAPI(title="Clinical Data ETL Service", version="1.0.0")
