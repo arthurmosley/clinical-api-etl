@@ -1,0 +1,2 @@
+study_id,participant_id,measurement_type,value,unit,timestamp,site_id,quality_score
+STUDYTEST,P003,glucose,1000,mg/dL,2024-01-15T11:00:00Z,SITE_X,0.97

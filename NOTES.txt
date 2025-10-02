@@ -1,3 +1,9 @@
+AUTHOR: Arthur Mosley
+This document served as a place for me to store my thoughts aside from writing inline comments in the code.
+
+*** NOTES ON AI USAGE ***
+
+
 --- Checking Tables ---
 docker compose up -d postgres
 docker compose exec postgres psql -U user -d clinical_data -c "\dt"

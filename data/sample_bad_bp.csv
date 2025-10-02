@@ -1,0 +1,2 @@
+study_id,participant_id,measurement_type,value,unit,timestamp,site_id,quality_score
+STUDYTEST,P002,blood_pressure,120-80,mmHg,2024-01-15T10:00:00Z,SITE_X,0.95

@@ -95,7 +95,7 @@ export class DatabaseService {
     let query = `
       SELECT id, study_id, participant_id, measurement_type, value, unit, 
              timestamp, site_id, quality_score, processed_at
-      FROM clinical_measurements
+      FROM staging.clinical_measurements
       WHERE 1=1
     `;
     const params: any[] = [];
