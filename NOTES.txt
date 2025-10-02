@@ -1,8 +1,34 @@
 AUTHOR: Arthur Mosley
 This document served as a place for me to store my thoughts aside from writing inline comments in the code.
 
-*** NOTES ON AI USAGE ***
+*** Overall comments regarding this experience ***
+Thank you George for giving me the opportunity to complete this assessment. I really enjoyed getting my feet (really) wet
+by doing this project and I learned a lot and found that I have so much more to learn as well. Parts 1 and 2 were
+relatively easy for me to accomplish and it didn't take too much time to wrap my head around what I should do. However,
+step 3 took me by surprise. 
+I felt like I had to completely overhaul how I approached the ETL part of the service once I started reviewing STEP 3 of
+this project. In hindsight I would have prioritized working out the database schema and requirements there before working
+on the ETL as extensively as I did. I think that burdoned me a bit when trying to refactor a lot of it. I did spend a lot 
+more time on this project than what was expected but I played around with some ideas, read about how things could be 
+extended and even tried extending some of the requirements through actual code implementations. 
 
+*** NOTES ON AI USAGE ***
+The only AI agent used was ChatGPT for this assessment. Initially I used it to familiarize myself with what was in 
+requirements.txt as well as the python FastAPI, sqlalchemy and pandas libraries. I also used
+ChatGPT to help me transform my ETL from what it was before the database changes. 
+
+Smaller things I used ChatGPT for:
+1. Various testing scenarios beyond what I had thought of.
+2. debugging pandas related data manipulation
+3. Edgecase psql related table relation conflicts and issues.
+
+*** I'm a big proponent of using AI for feedback on ideas, various test scenarios, and edgecase discovery
+        However, I always used my mind first and questioned everything that it gave me. And asked
+        for thorough explanations when 1. I didn't understand a concept, and 2. when it proposed something
+        that I was not familiar with. 
+
+If I had more time to work on this I would dig more deeply into other existing pandas opensource projects
+to better understand idiomatic usage.
 
 --- Checking Tables ---
 docker compose up -d postgres
@@ -21,6 +47,9 @@ docker compose exec etl ls -l /app/data
 --- tracking logs for etl service
         docker compose logs -f etl
 
+--- MEDICAL TERMINOLOGY:
+    Systolic is the first number,
+    Diastolic is the second number.
 
 https://docs.sqlalchemy.org/en/20/core/engines.html
 https://fastapi.tiangolo.com/reference/testclient/ 
@@ -59,3 +88,5 @@ https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf
 -- - studies
 -- - data_quality_reports
 -- - measurement_aggregations
+
+
