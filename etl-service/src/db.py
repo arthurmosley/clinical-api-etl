@@ -26,7 +26,8 @@ def fetch_job(job_id: str) -> Optional[Dict[str, Any]]:
       SELECT id, filename, study_id, status, created_at, updated_at, completed_at, error_message
       FROM etl_jobs WHERE id = :id
     """
-    fetch_one(sql, {"id": job_id})
+    return fetch_one(sql, {"id": job_id})
+    
 
 def mark_status(job_id: str, status: str, message: Optional[str] = None) -> None:
     engine_execute(
