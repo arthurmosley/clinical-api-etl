@@ -2,6 +2,13 @@ import axios from 'axios';
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { DatabaseService } from './database.service';
 
+type JobStatus = {
+  jobId: string;
+  status: string;
+  progress?: number;
+  message?: string;
+};
+
 export interface ETLJob {
   id: string;
   filename: string;
@@ -73,7 +80,7 @@ export class ETLService {
   // /**
   //  * Get ETL job status from ETL service
   //  */
-  async getJobStatus(jobId: string): Promise<{ status: string; progress?: number; message?: string } | null> {
+  async getJobStatus(jobId: string): Promise<JobStatus | null> {
   //   // Implementation needed:
   //   // 1. Validate jobId exists in database
     if (!isUuid(jobId)){
@@ -83,29 +90,40 @@ export class ETLService {
     const exists = await this.getJob(jobId);
     if (!exists) return null;
 
-    // creating object that I will be returning.
-    const jobStatus: {
-        status: string
-        progress?: number,
-        message?: string} = { status: ''}
-
     try {
       // http request on the etlService
       const url = `${this.etlServiceUrl}/jobs/${jobId}/status`
       const { data } = await axios.get(url, {timeout: 5000});
+
+      // Quick checks
       const status = String(data?.status || '');
-      if (!status) return {status: 'failed', message: 'bad etl response'};
-      jobStatus.status = data.status
-      if (typeof data?.progress === 'number') jobStatus.progress = data.progress;
-      if (typeof data?.message === 'string') jobStatus.message = data.message;
+      if (!status){
+        return {jobId, status: 'failed', message: 'bad etl response'};
+      }
+      if (!(typeof data?.progress === 'number')) {
+        return {jobId, status: 'failed', message: 'invalid progress data'};
+      }
+      if (!(typeof data?.message === 'string')){
+        return {jobId, status: 'failed', message: 'invalid message data'};
+      }
+
+      return {
+        jobId,
+        status,
+        progress: data?.progress,
+        message: data?.message,
+      }
+
     }
     catch(error: any) {
-      jobStatus.status = 'failed';
-      jobStatus.message = 'Failed to get ETL job status with error: ' + error?.message;
+      return {
+        jobId,
+        status: "Failed",
+        message: "Failed to get ETL job status with error: " + error?.message,
+      }
     }
     // TODO: Handle errors more extensively? Revisiting this.
 
     //   // 3. Handle connection errors gracefully
-    return jobStatus;
   }
 }
