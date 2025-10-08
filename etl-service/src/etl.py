@@ -260,7 +260,8 @@ def process_job(job_id: str, csv_path: str) -> None:
         aggs = build_aggs_from_processed(job_id, processed)
         upsert_aggs(aggs)
 
-        set_progress(job_id, 100, "completed")
+        mark_status(job_id, "completed", None)
+        set_progress(job_id, 100, "completed", "completed")
     except Exception as e:
         mark_status(job_id, "failed", str(e))
         set_progress(job_id, 100, f"failed: {e}")
