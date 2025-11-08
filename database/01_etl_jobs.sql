@@ -1,4 +1,5 @@
 -- ETL Jobs tracking table
+-- THIS TABLE DOESNT MATTER RIGHT NOW 11/6
 CREATE TABLE IF NOT EXISTS etl_jobs (
     id UUID PRIMARY KEY,
     filename VARCHAR(255) NOT NULL,

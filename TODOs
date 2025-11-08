@@ -1,0 +1,40 @@
+Questions for myself:
+    Do we want to allow data that is malformed to just not be inserted into the database and just returns to the
+    user for them to fix?
+        1. Allow data in: let the valid data come into the database for analytics
+            - skip the malformed data
+            - insert the malformed data into another table for referencing
+        2. Don't allow data in: Roll back the transaction and simply return to the user what data in the
+        input was bad and what data we should expect.
+
+    *** 11/6 Table this for later. Assume all of the data fits the criteria of the assignment and can be ingested by our pipeline. 
+
+python3 generate-dummy-data.py --out combined_measurements_faker_1_100k.csv --participants-per-study 5000 --days-per-participant 4 --seed 42
+120000
+
+NOTES:
+1. staging is the only major thing that occurs in the python code. cleaning and making sure the data going into the database conforms to
+what the database expects.
+2. handle everything from dims to processing to ultimately facts in the postgreSQL part of the pipeline.
+
+ASSUMPTION: PARTICIPANT IS UNIQUE TO A STUDY BUT A PARTICIPANT CAN BE IN MULTIPLE SITES
+
+TODO:
+
+Database cleanup:
+    Data types
+    Tables
+    Relations between tables
+    What data do I want out of the data given.
+
+Presentation talking points:
+    1. Python data cleaning and upserting data into the DB
+    2. Database design
+        a. Create database diagrams (Entity-Relationship (ER) Model)
+
+Process of input file to table:
+    1. 
+
+
+
+

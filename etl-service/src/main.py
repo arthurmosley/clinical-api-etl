@@ -28,7 +28,7 @@ class ETLJobStatus(BaseModel):
     message: Optional[str] = None
 
 def valid_path(name: str) -> Path:
-    p = (DATA_DIR / name).resolve()
+    p = (DATA_DIR / name)
     if not p.is_file():
         raise HTTPException(status_code=400, detail="Not a file.")
     return p

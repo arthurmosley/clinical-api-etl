@@ -67,62 +67,67 @@ def upsert_job(job_id: str, filename: str, study_id: str | None) -> None:
     """
     engine_execute(sql, {"id": job_id, "fn": filename, "sid": study_id})
 
+# ON CONFLICT I DO WANNA DO SOMETHING.
+
+def upsert_studies(job_id: str) -> None:
+  engine_execute(
+      """INSERT INTO dims.studies(study_name)
+            SELECT DISTINCT study_id
+            FROM staging.clinical_measurements
+            WHERE job_id=:j
+          ON CONFLICT DO NOTHING""",
+      {"j": job_id},
+  )
+
+# TODO: FINISH THESE UPSERTS. AFTER WE DO JOINS INTO THE PROCESSING TABLE FROM THERE WE CREATE FACT TABLES FOR ANALYSIS
+
+def upsert_sites(job_id: str) -> None:
+  engine_execute(
+    """INSERT INTO dims.sites(site_name)
+          SELECT DISTINCT ds.id, s.site_id
+          FROM staging.clinical_measurements s
+          JOIN dims.studies ds ON ds.study_name = s.study_id
+          WHERE job_id=:j
+        ON CONFLICT (study_id, site_name) DO NOTHING""",
+    {"j": job_id},
+  )
+
+def upsert_participants(job_id: str) -> None:
+  engine_execute(
+    """INSERT INTO dims.participants(participant_name)
+          SELECT DISTINCT ds.id, s.participant_id
+          FROM staging.clinical_measurements s
+          JOIN dims.studies ds ON ds.study_name = s.study_id
+          WHERE job_id=:j
+        ON CONFLICT DO NOTHING""",
+    {"j": job_id},
+  )
+
+def upsert_units(job_id: str) -> None:
+  engine_execute(
+    """INSERT INTO dims.units(unit)
+          SELECT DISTINCT unit
+          FROM staging.clinical_measurements
+          WHERE job_id=:j
+        ON CONFLICT DO NOTHING""",
+    {"j": job_id},
+  )
+
+def upsert_measurement_types(job_id: str) -> None:
+  engine_execute(
+    """INSERT INTO dims.measurement_types(measurement)
+          SELECT DISTINCT measurement_type
+          FROM staging.clinical_measurements s
+          JOIN dims.units du ON du.unit = s.unit
+          WHERE job_id=:j
+        ON CONFLICT DO NOTHING""",
+    {"j": job_id},
+  )
+
 def upsert_dims(job_id: str) -> None:
-    engine_execute(
-        """INSERT INTO studies(study_id)
-             SELECT DISTINCT study_id
-               FROM staging.clinical_measurements
-              WHERE job_id=:j
-           ON CONFLICT DO NOTHING""",
-        {"j": job_id},
-    )
-    engine_execute(
-        """INSERT INTO participants(study_id, participant_id, site_id)
-             SELECT DISTINCT study_id, participant_id, site_id
-               FROM staging.clinical_measurements
-              WHERE job_id=:j
-           ON CONFLICT (study_id, participant_id)
-           DO UPDATE SET site_id=EXCLUDED.site_id""",
-        {"j": job_id},
-    )
+  upsert_studies(job_id)
+  upsert_sites(job_id)
+  upsert_participants(job_id)
+  upsert_units(job_id)
+  upsert_measurement_types(job_id)
 
-def insert_processed_rows(rows: List[Dict[str, Any]]) -> None:
-    sql = """
-    INSERT INTO processed_measurements(
-      study_id, participant_id, site_id, measurement_type, measured_at,
-      value_num, value_text, unit, quality_score, raw_row_id, job_id
-    )
-    VALUES(
-      :study_id, :participant_id, :site_id, :measurement_type, :measured_at,
-      :value_num, :value_text, :unit, :quality_score, :raw_row_id, :job_id
-    )
-    ON CONFLICT ON CONSTRAINT uq_pm_obs DO NOTHING
-    """
-    batch_engine_execute(sql, rows)
-
-def insert_quality_counts(rows: List[Dict[str, Any]]) -> None:
-    sql = """
-    INSERT INTO data_quality_reports(job_id, rule_name, severity, affected_rows)
-    VALUES (:job_id, :rule_name, :severity, :affected_rows)
-    """
-    batch_engine_execute(sql, rows)
-
-
-def upsert_aggregation_rows(rows: List[Dict[str, Any]]) -> None:
-    sql = """
-    INSERT INTO measurement_aggregations(
-      study_id, participant_id, site_id, measurement_type,
-      cnt, avg_num, min_num, max_num, job_id
-    )
-    VALUES(
-      :study_id, :participant_id, :site_id, :measurement_type,
-      :cnt, :avg_num, :min_num, :max_num, :job_id
-    )
-    ON CONFLICT (study_id, participant_id, site_id, measurement_type)
-    DO UPDATE SET
-      cnt     = EXCLUDED.cnt,
-      avg_num = EXCLUDED.avg_num,
-      min_num = LEAST(measurement_aggregations.min_num, EXCLUDED.min_num),
-      max_num = GREATEST(measurement_aggregations.max_num, EXCLUDED.max_num)
-    """
-    batch_engine_execute(sql, rows)

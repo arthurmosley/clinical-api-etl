@@ -3,16 +3,16 @@ CREATE SCHEMA IF NOT EXISTS staging;
 
 CREATE TABLE IF NOT EXISTS staging.clinical_measurements (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    study_id VARCHAR(50) NOT NULL,
-    participant_id VARCHAR(50) NOT NULL,
-    measurement_type VARCHAR(50) NOT NULL,
-    value TEXT NOT NULL,
-    unit VARCHAR(20),
-    "timestamp" TIMESTAMP NOT NULL,
-    site_id VARCHAR(50) NOT NULL,
-    quality_score NUMERIC(3,2) CHECK (quality_score BETWEEN 0 and 1),
-    processed_at TIMESTAMP DEFAULT now(),
-    created_at TIMESTAMP DEFAULT now(),
+    study_id nvarchar(10) NOT NULL, -- slightly higher than what we're expecting this allows for studyIDs to go up to: 99,999.
+    participant_id VARCHAR(7) NOT NULL, -- largest single study had 162k participants. Allows: 999,999
+    measurement_type VARCHAR(20) NOT NULL,
+    value nvarchar(10) NOT NULL,
+    unit VARCHAR(10),
+    "timestamp" TIMESTAMPTZ NOT NULL,
+    site_id VARCHAR(25) NOT NULL, -- site_id is a string so corresponds to a name in input data. Allow 25 character max on the
+    _score NUMERIC(3,2) CHECK (_score BETWEEN 0 and 1),
+    processed_at TIMESTAMPTZ DEFAULT now(),
+    created_at TIMESTAMPTZ DEFAULT now(),
 
     -- new columns
     job_id UUID NOT NULL REFERENCES etl_jobs(id) ON DELETE CASCADE,

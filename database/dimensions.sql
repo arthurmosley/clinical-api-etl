@@ -1,0 +1,38 @@
+CREATE SCHEMA IF NOT EXISTS dims;
+
+CREATE TABLE IF NOT EXISTS dims.studies (
+  id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  study_name TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS dims.sites (
+  id SMALLINT GENERATED AS IDENTITY PRIMARY KEY,
+  study_id SMALLINT NOT NULL REFERENCES dims.studies(id) ON DELETE CASCADE,
+  site_name TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (study_id, site_name)
+);
+
+CREATE TABLE IF NOT EXISTS dims.participants (
+  id INT GENERATED AS IDENTITY PRIMARY KEY,
+  study_id SMALLINT NOT NULL REFERENCES dims.studies(id) ON DELETE CASCADE,
+  participant_name TEXT NOT NULL,
+  site_id SMALLINT NOT NULL REFERENCES dims.sites(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (study_id, participant_name)
+);
+
+CREATE TABLE IF NOT EXISTS dims.units (
+    id SMALLINT GENERATED AS IDENTITY PRIMARY KEY,
+    unit TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS dims.measurement_types (
+    id SMALLINT GENERATED AS IDENTITY PRIMARY KEY,
+    measurement TEXT NOT NULL,
+    unit SMALLINT NOT NULL REFERENCES dims.unit(id) 
+);
+
+CREATE INDEX IF NOT EXISTS ix_participants_site
+  ON participants(study_id, site_id);
