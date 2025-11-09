@@ -83,7 +83,7 @@ def upsert_studies(job_id: str) -> None:
 
 def upsert_sites(job_id: str) -> None:
   engine_execute(
-    """INSERT INTO dims.sites(site_name)
+    """INSERT INTO dims.sites(study_id, site_name)
           SELECT DISTINCT ds.id, s.site_id
           FROM staging.clinical_measurements s
           JOIN dims.studies ds ON ds.study_name = s.study_id
@@ -94,10 +94,12 @@ def upsert_sites(job_id: str) -> None:
 
 def upsert_participants(job_id: str) -> None:
   engine_execute(
-    """INSERT INTO dims.participants(participant_name)
-          SELECT DISTINCT ds.id, s.participant_id
+    """INSERT INTO dims.participants(study_id, participant_name, site_id)
+          SELECT DISTINCT ds.id, s.participant_id, dsi.id
           FROM staging.clinical_measurements s
           JOIN dims.studies ds ON ds.study_name = s.study_id
+          JOIN dims.sites dsi ON dsi.study_id = ds.id
+          AND dsi.site_name = s.site_id
           WHERE job_id=:j
         ON CONFLICT DO NOTHING""",
     {"j": job_id},
@@ -115,8 +117,8 @@ def upsert_units(job_id: str) -> None:
 
 def upsert_measurement_types(job_id: str) -> None:
   engine_execute(
-    """INSERT INTO dims.measurement_types(measurement)
-          SELECT DISTINCT measurement_type
+    """INSERT INTO dims.measurement_types(measurement, unit)
+          SELECT DISTINCT measurement_type, du.id
           FROM staging.clinical_measurements s
           JOIN dims.units du ON du.unit = s.unit
           WHERE job_id=:j

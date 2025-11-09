@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW v_study_quality AS
+/*CREATE OR REPLACE VIEW v_study_quality AS
 SELECT study_id, AVG(quality_score) AS avg_quality
 FROM processed_measurements
 GROUP BY study_id;
@@ -27,4 +27,4 @@ WHERE measured_at >= now() - interval '30 days';
 CREATE OR REPLACE VIEW v_participants_per_study AS
 SELECT study_id, COUNT(*) AS participants
 FROM participants
-GROUP BY study_id;
+GROUP BY study_id;*/

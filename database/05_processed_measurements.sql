@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS processed_measurements (
+/*CREATE TABLE IF NOT EXISTS processed_measurements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   study_id TEXT NOT NULL REFERENCES studies(study_id) ON DELETE CASCADE,
@@ -27,3 +27,4 @@ CREATE INDEX IF NOT EXISTS ix_pm_participant_time
   ON processed_measurements(study_id, participant_id, measured_at DESC);
 CREATE INDEX IF NOT EXISTS ix_pm_low_quality
   ON processed_measurements(quality_score) WHERE quality_score < 0.95;
+*/

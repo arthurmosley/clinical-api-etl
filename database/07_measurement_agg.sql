@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS measurement_aggregations (
+/*CREATE TABLE IF NOT EXISTS measurement_aggregations (
   id BIGSERIAL PRIMARY KEY,
   study_id TEXT NOT NULL,
   participant_id TEXT,
@@ -16,4 +16,4 @@ CREATE TABLE IF NOT EXISTS measurement_aggregations (
 CREATE INDEX IF NOT EXISTS ix_ma_study_type_day
   ON measurement_aggregations(study_id, measurement_type);
 CREATE INDEX IF NOT EXISTS ix_ma_participant_day
-  ON measurement_aggregations(study_id, participant_id);
+  ON measurement_aggregations(study_id, participant_id);*/

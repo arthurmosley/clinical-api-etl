@@ -13,9 +13,9 @@ python3 generate-dummy-data.py --out combined_measurements_faker_1_100k.csv --pa
 120000
 
 NOTES:
-1. staging is the only major thing that occurs in the python code. cleaning and making sure the data going into the database conforms to
-what the database expects.
+1. staging is the only major thing that occurs in the python code. cleaning and making sure the data going into the database conforms to what the database expects.
 2. handle everything from dims to processing to ultimately facts in the postgreSQL part of the pipeline.
+3. 0 round trips to the pandas code.
 
 ASSUMPTION: PARTICIPANT IS UNIQUE TO A STUDY BUT A PARTICIPANT CAN BE IN MULTIPLE SITES
 
