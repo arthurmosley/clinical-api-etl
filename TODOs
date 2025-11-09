@@ -36,5 +36,14 @@ Process of input file to table:
     1. 
 
 
+FACT TABLES ARE DONE NOW I CAN CREATE VIEWS ON THESE FACT TABLES
+
+TODOS 11/9:
+    Create views and aggregates based on the incoming data.
+    CREATE A TABLE TO HOUSE DATA THAT ISN'T CONFORMANT.
+        Soft fail (fail just for the non conformant data)
+    
+    FIGURE OUT WHAT ELSE WOULD BE GOOD IN THE PANDAS TO DO
+
 
 

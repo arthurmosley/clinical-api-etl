@@ -133,3 +133,42 @@ def upsert_dims(job_id: str) -> None:
   upsert_units(job_id)
   upsert_measurement_types(job_id)
 
+def upsert_scalar_facts(job_id: str) -> None:
+   engine_execute(
+      """
+      INSERT INTO facts.scalar_facts (
+          study_id, 
+          site_id, 
+          participant_id, 
+          measurement_type_id, 
+          measured_at, 
+          value_num, 
+          unit_id, 
+          quality_score)
+      SELECT 
+          dstudy.id,
+          dsites.id,
+          dparts.id,
+          dm.id,
+          s.processed_at,
+          s.value::numeric(4,1),
+          dm.unit,
+          s.quality_score::numeric(3,2)
+      FROM staging.clinical_measurements s
+          JOIN dims.studies dstudy ON dstudy.study_name = s.study_id
+          JOIN dims.sites dsites 
+              ON dsites.study_id = dstudy.id 
+              AND dsites.site_name = s.site_id
+          JOIN dims.participants dparts 
+              ON dparts.study_id = dstudy.id
+              AND dparts.site_id = dsites.id
+              AND dparts.participant_name = s.participant_id
+          JOIN dims.measurement_types dm ON dm.measurement = s.measurement_type
+      WHERE job_id=:j
+          AND dm.measurement <> 'blood_pressure' -- all but blood pressure for measurement types
+          AND s.measurement_type <> 'blood_pressure' -- keep only numeric values
+      ON CONFLICT (study_id, site_id, participant_id, measured_at, measurement_type_id) DO NOTHING;""",
+      {"j": job_id},
+   )
+
+
