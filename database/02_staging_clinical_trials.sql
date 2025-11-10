@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS staging.clinical_measurements (
     unit VARCHAR(10),
     "timestamp" TIMESTAMPTZ NOT NULL,
     site_id VARCHAR(25) NOT NULL, -- site_id is a string so corresponds to a name in input data. Allow 25 character max on the
-    quality_score NUMERIC(3,2) CHECK (quality_score BETWEEN 0 and 1),
+    quality_score varchar(10),
     processed_at TIMESTAMPTZ DEFAULT now(),
     created_at TIMESTAMPTZ DEFAULT now(),
 
@@ -20,6 +20,15 @@ CREATE TABLE IF NOT EXISTS staging.clinical_measurements (
     row_num INT NOT NULL,
 
     CONSTRAINT ux_raw_job_file_row UNIQUE (job_id, source_filename, row_num)
+);
+
+CREATE TABLE IF NOT EXISTS staging.rejections (
+  job_id UUID NOT NULL,
+  staging_row_id UUID NOT NULL,
+  reason_code TEXT NOT NULL,
+  detail TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  unique (job_id, staging_row_id, reason_code)
 );
 
 -- Basic indexes (candidate should optimize)

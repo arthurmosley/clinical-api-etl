@@ -47,3 +47,29 @@ TODOS 11/9:
 
 
 
+def upsert_units(job_id: str) -> None:
+  engine_execute(
+    """INSERT INTO dims.units(unit)
+          SELECT DISTINCT unit
+          FROM staging.clinical_measurements
+          WHERE job_id=:j
+          AND BTRIM(COALESCE(unit, '')) <> ''
+        ON CONFLICT DO NOTHING""",
+    {"j": job_id},
+  )
+
+def upsert_measurement_types(job_id: str) -> None:
+  engine_execute(
+    """INSERT INTO dims.measurement_types(measurement, unit)
+          SELECT DISTINCT measurement_type, du.id
+          FROM staging.clinical_measurements s
+          JOIN dims.units du ON du.unit = s.unit
+          WHERE job_id=:j
+        ON CONFLICT DO NOTHING""",
+    {"j": job_id},
+
+11/10 TODOS: 
+
+1. FIGURE OUT INDEXES
+2. CLEAN UP THE TABLES
+3. CLEAN UP THE PYTHON CODE

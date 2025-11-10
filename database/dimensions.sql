@@ -28,11 +28,12 @@ CREATE TABLE IF NOT EXISTS dims.participants (
 CREATE TABLE IF NOT EXISTS dims.units (
     id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     unit TEXT NOT NULL,
-    unit_type TEXT NOT NULL
+    UNIQUE (unit)
 );
 
 CREATE TABLE IF NOT EXISTS dims.measurement_types (
     id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     measurement TEXT NOT NULL,
-    unit SMALLINT NOT NULL REFERENCES dims.units(id) 
+    unit SMALLINT NOT NULL REFERENCES dims.units(id),
+    UNIQUE (measurement, unit)
 );

@@ -1,0 +1,34 @@
+#+title: Notes for Clinical ETL API
+
+* Start Everything: docker compose up --build
+** curl -s http://localhost:3000/health
+** curl -s http://localhost:8000/health
+** Submit a job and capture the job ID
+*** 
+#+begin_src <bash>
+  SUBMIT=$(curl -s -X POST http://localhost:3000/api/etl/jobs \
+  -H 'Content-Type: application/json' \
+  -d '{"filename":"sample_study001.csv","studyId":"STUDY001"}')
+echo "$SUBMIT"
+JOB=$(echo "$SUBMIT" | jq -r '.data.jobId')
+echo "$JOB"
+#+end_src"
+** Poll job status:
+*** curl -s "http://localhost:3000/api/etl/jobs/$JOB/status"
+**** Expected JSON shape:
+**** 
+#+begin_src json
+{
+  "success": true,
+  "message": "Status retrieved successfully",
+  "data": { "jobId":"…","status":"running|completed|failed","progress":0-100,"message":"…" }
+}
+#+end_src
+**** Follow ETL logs: docker compose logs -f etl
+* Docker Configurations:
+** Port 3000: ts API
+** Port 8000: etl API
+* ETL Service
+** 
+
+* API Service
